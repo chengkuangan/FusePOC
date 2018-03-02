@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Copyright 2014-2017, Red Hat, Inc. and/or its affiliates, and individual
+    contributors by the @authors tag. 
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+    http://www.apache.org/licenses/LICENSE-2.0
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+-->
+<!-- Configures the Camel Context-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:cxf="http://camel.apache.org/schema/cxf"
+    xmlns:jdbc="http://www.springframework.org/schema/jdbc"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.springframework.org/schema/beans           http://www.springframework.org/schema/beans/spring-beans.xsd                  http://camel.apache.org/schema/spring      http://camel.apache.org/schema/spring/camel-spring.xsd          http://camel.apache.org/schema/cxf      http://camel.apache.org/schema/cxf/camel-cxf.xsd     http://www.springframework.org/schema/jdbc      http://www.springframework.org/schema/jdbc/spring-jdbc-3.0.xsd">
+    <cxf:cxfEndpoint address="http://localhost:9292/cxf/makePayment"
+        id="myPaymentEndpoint" loggingFeatureEnabled="true" serviceClass="com.jboss.demo.PaymentService"/>
+    <bean class="org.apache.commons.dbcp.BasicDataSource" id="myDS">
+        <property name="driverClassName" value="org.postgresql.Driver"/>
+        <property name="url" value="jdbc:postgresql://localhost:5432/myDemo"/>
+        <property name="username" value="postgres"/>
+        <property name="password" value="password"/>
+    </bean>
+    <bean class="org.apache.activemq.camel.component.ActiveMQComponent" id="activemq">
+        <property name="brokerURL" value="tcp://localhost:61616"/>
+        <property name="userName" value="admin"/>
+        <property name="password" value="admin"/>
+    </bean>
+    <camelContext id="_camelContext1" xmlns="http://camel.apache.org/schema/spring">
+        <route id="_route1">
+            <from id="_from1" uri="cxf:bean:myPaymentEndpoint"/>
+            <convertBodyTo id="_convertBodyTo1" type="com.jboss.demo.PaymentRequest"/>
+            <log id="_log1" message="Body Content: ${body.merchantId}"/>
+            <multicast id="_multicast1">
+                <to id="_to3" uri="direct:database"/>
+                <to id="_to4" uri="direct:demoQueue1"/>
+            </multicast>
+            <unmarshal id="_unmarshal1">
+                <json library="Jackson" unmarshalTypeName="com.jboss.demo.PaymentRequest"/>
+            </unmarshal>
+            <log id="_log7" message="after multicast : body : ${body}"/>
+        </route>
+        <route id="_route2">
+            <from id="_from2" uri="direct:database"/>
+            <log id="_log4" message="Inside multicast : Body Content: ${body}"/>
+            <to id="_to1" uri="sql:classpath:insertTxnLog.sql?dataSource=myDS"/>
+            <log id="_log6" message="after database : body : ${body}"/>
+        </route>
+        <route id="_route3">
+            <from id="_from3" uri="direct:demoQueue1"/>
+            <log id="_log2" message="Converted to Json : Body : ${body}"/>
+            <marshal id="_marshal1">
+                <json library="Jackson"/>
+            </marshal>
+            <log id="_log3" message="after marshal : body : ${body}"/>
+            <to id="_to2" pattern="InOnly" uri="activemq:queue:demoQueue"/>
+            <log id="_log5" message="After AMQ : ${body}"/>
+        </route>
+    </camelContext>
+</beans>

@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Copyright 2014-2017, Red Hat, Inc. and/or its affiliates, and individual
+    contributors by the @authors tag. 
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+    http://www.apache.org/licenses/LICENSE-2.0
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+-->
+<!-- Configures the Camel Context-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:cxf="http://camel.apache.org/schema/cxf"
+    xmlns:jdbc="http://www.springframework.org/schema/jdbc"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.springframework.org/schema/beans           http://www.springframework.org/schema/beans/spring-beans.xsd                  http://camel.apache.org/schema/spring      http://camel.apache.org/schema/spring/camel-spring.xsd          http://camel.apache.org/schema/cxf      http://camel.apache.org/schema/cxf/camel-cxf.xsd     http://www.springframework.org/schema/jdbc      http://www.springframework.org/schema/jdbc/spring-jdbc-3.0.xsd">
+    <bean class="com.jboss.poc.processor.IncidentsProcessor" id="incidentsProcessor"/>
+    <bean class="org.apache.activemq.camel.component.ActiveMQComponent" id="activemq">
+        <property name="brokerURL" value="tcp://localhost:61616"/>
+        <property name="userName" value="admin"/>
+        <property name="password" value="admin"/>
+    </bean>
+    <cxf:rsServer address="http://localhost:9290/"
+        id="qIncidentsEndpoint" loggingFeatureEnabled="true" serviceClass="com.jboss.poc.services.QIncidentsService">
+        <cxf:providers>
+            <bean class="com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider"/>
+        </cxf:providers>
+    </cxf:rsServer>
+    <cxf:rsServer address="http://localhost:9390/"
+        id="resilientEndpoint" loggingFeatureEnabled="true" serviceClass="com.jboss.poc.services.IncidentsService">
+        <cxf:providers>
+            <bean class="com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider"/>
+        </cxf:providers>
+    </cxf:rsServer>
+    <camelContext id="_camelContext1" xmlns="http://camel.apache.org/schema/spring">
+        <route id="_receiveIncidentsFromQRadar">
+            <from id="_from_cxfrs_apiEndpoint" uri="cxfrs:bean:qIncidentsEndpoint"/>
+            <log id="_log11" message="qIncidentsEndpoint -> body : ${body}"/>
+            <convertBodyTo id="_convertBodyTo1" type="java.lang.String"/>
+            <log id="_log1" message="qIncidentsEndpoint -> after marshal -> body : ${body}"/>
+            <to id="_to1" pattern="InOnly" uri="activemq:queue:ste.queue.qIncidents"/>
+            <setBody id="_statusOK">
+                <simple>{"status":"ok"}</simple>
+            </setBody>
+        </route>
+        <route id="_postIncidentsToResilient">
+            <from id="_from1" uri="activemq:queue:ste.queue.qIncidents"/>
+            <setProperty id="_setResilientServer" propertyName="resilient.server">
+                <simple>localhost:9390</simple>
+            </setProperty>
+            <setProperty id="_setOriginalMessage" propertyName="original.message">
+                <simple>${body}</simple>
+            </setProperty>
+            <unmarshal id="_unmarshal1">
+                <json library="Jackson" unmarshalTypeName="com.jboss.poc.model.Incidents"/>
+            </unmarshal>
+            <process id="_PostToResilient" ref="incidentsProcessor"/>
+        </route>
+        <!--  
+        <route id="_simulate_Resilient">
+            <from id="_resilient" uri="cxfrs:bean:resilientEndpoint"/>
+            <log id="_log2" message="Simulated Resilient -> Body -> ${body}"/>
+        </route>
+        -->
+    </camelContext>
+</beans>
