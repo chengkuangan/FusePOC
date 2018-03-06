@@ -19,6 +19,7 @@
     xmlns:jdbc="http://www.springframework.org/schema/jdbc"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.springframework.org/schema/beans           http://www.springframework.org/schema/beans/spring-beans.xsd                  http://camel.apache.org/schema/spring      http://camel.apache.org/schema/spring/camel-spring.xsd          http://camel.apache.org/schema/cxf      http://camel.apache.org/schema/cxf/camel-cxf.xsd     http://www.springframework.org/schema/jdbc      http://www.springframework.org/schema/jdbc/spring-jdbc-3.0.xsd">
     <bean class="com.jboss.poc.processor.IncidentsProcessor" id="incidentsProcessor"/>
+    <bean class="com.jboss.poc.processor.ProxyProcessor" id="proxyProcessor"/>
     <bean class="org.apache.activemq.camel.component.ActiveMQComponent" id="activemq">
         <property name="brokerURL" value="tcp://localhost:61616"/>
         <property name="userName" value="admin"/>
@@ -30,8 +31,8 @@
             <bean class="com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider"/>
         </cxf:providers>
     </cxf:rsServer>
-    <cxf:rsServer address="http://localhost:9390/"
-        id="resilientEndpoint" loggingFeatureEnabled="true" serviceClass="com.jboss.poc.services.IncidentsService">
+    <cxf:rsServer address="http://localhost:9291/" id="proxyEndpoint"
+        loggingFeatureEnabled="true" serviceClass="com.jboss.poc.services.QIncidentsService">
         <cxf:providers>
             <bean class="com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider"/>
         </cxf:providers>
@@ -60,11 +61,13 @@
             </unmarshal>
             <process id="_PostToResilient" ref="incidentsProcessor"/>
         </route>
-        <!--  
-        <route id="_simulate_Resilient">
-            <from id="_resilient" uri="cxfrs:bean:resilientEndpoint"/>
-            <log id="_log2" message="Simulated Resilient -> Body -> ${body}"/>
+        <route id="_proxy">
+            <from id="_from2" uri="cxfrs:bean:proxyEndpoint"/>
+            <log id="_log2" message="Path from HTTP Header -> ${header.CamelHttpPath}"/>
+            <setProperty id="_QRadarServer" propertyName="qradar.server">
+                <simple>localhost:9391</simple>
+            </setProperty>
+            <process id="_ProxyRequest" ref="proxyProcessor"/>
         </route>
-        -->
     </camelContext>
 </beans>
