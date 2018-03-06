@@ -28,10 +28,18 @@ public class QIncidentsService {
 	}
 	
 	@GET
+	@Path("/api/siem/offenses")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces (MediaType.APPLICATION_JSON)
+	public String getOffenses(@Body String data){
+		return "{\"status\":\"OK\"}";
+	}
+	
+	@POST
 	@Path("/api/siem/offenses/{offenses_id}")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces (MediaType.APPLICATION_JSON)
-	public String getOffensesById(@Body String data, @PathParam("offenses_id") String action){
+	public String postOffenses(@Body String data, @PathParam("offenses_id") String action){
 		return "{\"status\":\"OK\"}";
 	}
 	
@@ -69,7 +77,7 @@ public class QIncidentsService {
 	}
 	
 	@GET
-	@Path("/api/config/domainmanagement/domains")
+	@Path("/api/config/domain_management/domains")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces (MediaType.APPLICATION_JSON)
 	public String getConfigProxyData(@Body String data, @PathParam("action") String action ){
@@ -77,11 +85,20 @@ public class QIncidentsService {
 	}
 	
 	@GET
-	@Path("/api/referenced_data/{action}")
+	@Path("/api/reference_data/sets")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces (MediaType.APPLICATION_JSON)
-	public String getReferencedDataProxyData(@Body String data, @PathParam("action") String action ){
+	public String getReferencedDataSets(@Body String data){
 		return "{\"status\":\"OK\"}";
 	}
+	
+	@POST
+	@Path("/api/reference_data/sets")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces (MediaType.APPLICATION_JSON)
+	public String postReferencedDataSets(@Body String data){
+		return "{\"status\":\"OK\"}";
+	}
+	
 
 }

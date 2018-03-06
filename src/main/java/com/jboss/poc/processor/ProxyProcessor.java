@@ -33,8 +33,12 @@ public class ProxyProcessor implements Processor {
 		List<Object> providers = new ArrayList<Object>();
 		providers.add(new JacksonJsonProvider());
 		queryString = (queryString !=null && queryString.trim().length() > 0) ? "?" + queryString : "";
-
-		WebClient client = WebClient.create("http://" + server + "/" + httpPath + queryString, providers);
+		String url = "http://" + server + "/" + httpPath + queryString;
+		
+		WebClient client = WebClient.create(url, providers);
+		
+		System.out.println("ProxyProcessor -> URL called -> " + url);
+		
 		//WebClient client = WebClient.create("http://" + server + "/" + "/incidents", providers);
 		client = client.accept("application/json").type("application/json");
 		Response r = null;
