@@ -71,13 +71,23 @@
         </route>
         <route id="_proxy">
             <from id="_from2" uri="cxfrs:bean:proxyEndpoint"/>
-            <log id="_log2" message="Path from HTTP Header -> ${header.CamelHttpPath}"/>
+            <setProperty id="_CamelHttpPath" propertyName="HTTP_PATH">
+                <simple>${header.CamelHttpPath}</simple>
+            </setProperty>
             <setProperty id="_QRadarServer" propertyName="qradar.server">
                 <simple>http://localhost:9391</simple>
             </setProperty>
             <process id="_ProxyRequest" ref="proxyProcessor"/>
-            <convertBodyTo id="_convertBodyTo2" type="java.lang.String"/>
-            <to id="_to2" pattern="InOnly" uri="activemq:queue:pentaho"/>
+            <setProperty id="_Body" propertyName="BODY_MESSAGE">
+                <simple>${body}</simple>
+            </setProperty>
+            <setBody id="_HttpPath_Body">
+                <simple>${exchangeProperty.HTTP_PATH},${exchangeProperty.BODY_MESSAGE}</simple>
+            </setBody>
+            <to id="_to3" pattern="InOnly" uri="activemq:queue:pentaho"/>
+            <setBody id="_body">
+                <simple>${exchangeProperty.BODY_MESSAGE}</simple>
+            </setBody>
         </route>
         <route id="_TestBasicAuth">
             <from id="_from3" uri="cxfrs:bean:testBasicAuthEndpoint"/>
