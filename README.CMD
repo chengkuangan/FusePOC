@@ -22,6 +22,15 @@ api/reference_data/sets,[
 "timeout_type": "UNKNOWN"
 } ]
 
+Please change the following to reflect the actual Resilient Server
+<setProperty id="_setResilientServer" propertyName="resilient.server">
+                <simple>http://localhost:9390</simple>
+            </setProperty>
+            
+Please change the following to reflect the actual QRadar Server
+<setProperty id="_QRadarServer" propertyName="qradar.server">
+                <simple>http://localhost:9391</simple>
+            </setProperty>            
 
 To build, CD to the source root directory
 
