@@ -17,8 +17,8 @@
   </licenses>
   <properties>
     <camel.version>2.17.0.redhat-630187</camel.version>
-    <version.maven-bundle-plugin>3.2.0</version.maven-bundle-plugin>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+    <version.maven-bundle-plugin>3.2.0</version.maven-bundle-plugin>
     <jboss.fuse.bom.version>6.3.0.redhat-187</jboss.fuse.bom.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
@@ -167,6 +167,14 @@
   </pluginRepositories>
   <build>
     <defaultGoal>install</defaultGoal>
+    <resources>
+      <resource>
+        <directory>.transformations</directory>
+      </resource>
+      <resource>
+        <directory>src/main/resources/</directory>
+      </resource>
+    </resources>
     <plugins>
       <plugin>
         <groupId>org.apache.felix</groupId>
@@ -177,7 +185,8 @@
           <instructions>
             <Bundle-SymbolicName>FusePOC</Bundle-SymbolicName>
             <Bundle-Name>TEE POC [FusePOC]</Bundle-Name>
-            <Import-Package>org.postgresql,*</Import-Package>
+            <Import-Package>org.postgresql,*,
+ com.sun.el;version="[2,3)"</Import-Package>
           </instructions>
         </configuration>
       </plugin>
