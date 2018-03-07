@@ -35,7 +35,7 @@ public class ProxyProcessor implements Processor {
 		queryString = (queryString !=null && queryString.trim().length() > 0) ? "?" + queryString : "";
 		String url = "http://" + server + "/" + httpPath + queryString;
 		
-		WebClient client = WebClient.create(url, providers);
+		WebClient client = WebClient.create(url, providers, "admin", "P@ssw0rd", null);
 		
 		System.out.println("ProxyProcessor -> URL called -> " + url);
 		
