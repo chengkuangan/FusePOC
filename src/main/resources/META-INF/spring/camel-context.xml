@@ -20,11 +20,18 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.springframework.org/schema/beans           http://www.springframework.org/schema/beans/spring-beans.xsd                  http://camel.apache.org/schema/spring      http://camel.apache.org/schema/spring/camel-spring.xsd          http://camel.apache.org/schema/cxf      http://camel.apache.org/schema/cxf/camel-cxf.xsd     http://www.springframework.org/schema/jdbc      http://www.springframework.org/schema/jdbc/spring-jdbc-3.0.xsd">
     <bean class="com.jboss.poc.processor.IncidentsProcessor" id="incidentsProcessor"/>
     <bean class="com.jboss.poc.processor.ProxyProcessor" id="proxyProcessor"/>
+    <bean class="com.jboss.poc.processor.TestBasicAuthProcessor" id="testBasicAuthProcessor"/>
     <bean class="org.apache.activemq.camel.component.ActiveMQComponent" id="activemq">
         <property name="brokerURL" value="tcp://localhost:61616"/>
         <property name="userName" value="admin"/>
         <property name="password" value="admin"/>
     </bean>
+    <cxf:rsServer address="http://localhost:9292/"
+        id="testBasicAuthEndpoint" loggingFeatureEnabled="true" serviceClass="com.jboss.poc.services.TestBasicAuthService">
+        <cxf:providers>
+            <bean class="com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider"/>
+        </cxf:providers>
+    </cxf:rsServer>
     <cxf:rsServer address="http://localhost:9290/"
         id="qIncidentsEndpoint" loggingFeatureEnabled="true" serviceClass="com.jboss.poc.services.QIncidentsService">
         <cxf:providers>
@@ -38,6 +45,7 @@
         </cxf:providers>
     </cxf:rsServer>
     <camelContext id="_camelContext1" xmlns="http://camel.apache.org/schema/spring">
+        <endpoint id="Java2Java" uri="dozer:Java2Java?sourceModel=com.jboss.poc.model.Type&amp;targetModel=com.jboss.poc.model.Action&amp;mappingFile=transformation.xml"/>
         <route id="_receiveIncidentsFromQRadar">
             <from id="_from_cxfrs_apiEndpoint" uri="cxfrs:bean:qIncidentsEndpoint"/>
             <log id="_log11" message="qIncidentsEndpoint -> body : ${body}"/>
@@ -51,7 +59,7 @@
         <route id="_postIncidentsToResilient">
             <from id="_from1" uri="activemq:queue:ste.queue.qIncidents"/>
             <setProperty id="_setResilientServer" propertyName="resilient.server">
-                <simple>localhost:9390</simple>
+                <simple>http://localhost:9390</simple>
             </setProperty>
             <setProperty id="_setOriginalMessage" propertyName="original.message">
                 <simple>${body}</simple>
@@ -65,11 +73,15 @@
             <from id="_from2" uri="cxfrs:bean:proxyEndpoint"/>
             <log id="_log2" message="Path from HTTP Header -> ${header.CamelHttpPath}"/>
             <setProperty id="_QRadarServer" propertyName="qradar.server">
-                <simple>localhost:9391</simple>
+                <simple>http://localhost:9391</simple>
             </setProperty>
             <process id="_ProxyRequest" ref="proxyProcessor"/>
             <convertBodyTo id="_convertBodyTo2" type="java.lang.String"/>
             <to id="_to2" pattern="InOnly" uri="activemq:queue:pentaho"/>
+        </route>
+        <route id="_TestBasicAuth">
+            <from id="_from3" uri="cxfrs:bean:testBasicAuthEndpoint"/>
+            <process id="_CallPostman" ref="testBasicAuthProcessor"/>
         </route>
     </camelContext>
 </beans>

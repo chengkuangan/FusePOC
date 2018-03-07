@@ -185,8 +185,7 @@
           <instructions>
             <Bundle-SymbolicName>FusePOC</Bundle-SymbolicName>
             <Bundle-Name>TEE POC [FusePOC]</Bundle-Name>
-            <Import-Package>org.postgresql,*,
- com.sun.el;version="[2,3)"</Import-Package>
+            <Import-Package>org.postgresql,*</Import-Package>
           </instructions>
         </configuration>
       </plugin>

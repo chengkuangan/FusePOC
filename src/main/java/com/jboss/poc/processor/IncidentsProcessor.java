@@ -26,7 +26,7 @@ public class IncidentsProcessor implements Processor {
 		List<Object> providers = new ArrayList<Object>();
 		providers.add(new JacksonJsonProvider());
 
-		WebClient client = WebClient.create("http://" + server + "/" + request.getId() + "/incidents", providers);
+		WebClient client = WebClient.create(server + "/" + request.getId() + "/incidents", providers);
 		//WebClient client = WebClient.create("http://" + server + "/" + "/incidents", providers);
 		client = client.accept("application/json").type("application/json");
 		Response r = client.post(message);
