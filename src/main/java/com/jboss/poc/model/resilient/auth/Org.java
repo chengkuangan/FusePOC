@@ -10,6 +10,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 		"authorized_ldap_group", "supports_ldap", "incident_deletion_allowed", "twofactor_cookie_lifetime_secs" })
 public class Org {
 
+	
 	@JsonProperty("id")
 	private int id;
 	@JsonProperty("name")

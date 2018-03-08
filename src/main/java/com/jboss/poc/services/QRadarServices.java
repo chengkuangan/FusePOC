@@ -10,3 +10,4 @@ public interface QRadarServices {
     @Produces({MediaType.APPLICATION_JSON })
     public String getOffenses();
 }
+

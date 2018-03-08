@@ -27,6 +27,7 @@
         <property name="userName" value="admin"/>
         <property name="password" value="admin"/>
     </bean>
+    
     <!-- /// Resilient Auth Client Endpoint -->
     <!--  Resilient Actual Address:https://172.16.6.115 -->
     <!--  Simulator address: http://localhost:9391/rest/session -->

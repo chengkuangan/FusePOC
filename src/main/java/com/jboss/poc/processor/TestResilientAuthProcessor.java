@@ -36,6 +36,7 @@ public class TestResilientAuthProcessor implements Processor {
 		headers.add("X-sess-id", auth.getCrsfToken());
 		client.headers(headers);
 		
+		
 		ClientConfiguration config = WebClient.getConfig(client);
 		HTTPConduit conduit = config.getHttpConduit();
 		TLSClientParameters params = conduit.getTlsClientParameters();

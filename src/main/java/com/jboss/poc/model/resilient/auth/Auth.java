@@ -10,6 +10,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 		"session_ip", "is_ldap", "is_saml" })
 public class Auth {
 
+	
 	@JsonProperty("orgs")
 	private List<Org> orgs = null;
 	@JsonProperty("user_id")

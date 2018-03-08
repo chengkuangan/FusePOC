@@ -26,3 +26,4 @@ public class IncidentsService {
 		return "{\"status\":\"OK\"}";
 	}
 }
+
