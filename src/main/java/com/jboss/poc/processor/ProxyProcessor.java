@@ -33,9 +33,9 @@ public class ProxyProcessor implements Processor {
 		String url = server + "/" + httpPath + queryString;
 		
 		// --- comment the following line if need to use Basic Authentication ----- //
-		WebClient client = WebClient.create(url, providers);
+		// --- WebClient client = WebClient.create(url, providers);
 		// --- uncomment the following line to enable basic authentication  ------//
-		// --- WebClient client = WebClient.create(url, providers, "admin", "P@ssw0rd", null);
+		WebClient client = WebClient.create(url, providers, "admin", "P@ssw0rd", null);
 		
 		ClientConfiguration config = WebClient.getConfig(client);
 		HTTPConduit conduit = config.getHttpConduit();

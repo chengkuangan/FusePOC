@@ -59,7 +59,8 @@
         <route id="_postIncidentsToResilient">
             <from id="_from1" uri="activemq:queue:ste.queue.qIncidents"/>
             <setProperty id="_setResilientServer" propertyName="resilient.server">
-                <simple>http://localhost:9390</simple>
+            		<simple>https://172.16.6.115</simple>
+                <!--  -simple>http://localhost:9390</simple-->
             </setProperty>
             <setProperty id="_setOriginalMessage" propertyName="original.message">
                 <simple>${body}</simple>
@@ -75,7 +76,8 @@
                 <simple>${header.CamelHttpPath}</simple>
             </setProperty>
             <setProperty id="_QRadarServer" propertyName="qradar.server">
-                <simple>http://localhost:9391</simple>
+            		<simple>https://172.16.100.19</simple>
+                <!-- simple>http://localhost:9391</simple-->
             </setProperty>
             <process id="_ProxyRequest" ref="proxyProcessor"/>
             <setProperty id="_Body" propertyName="BODY_MESSAGE">
