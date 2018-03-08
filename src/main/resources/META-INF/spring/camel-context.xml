@@ -70,6 +70,7 @@
             </unmarshal>
             <process id="_PostToResilient" ref="incidentsProcessor"/>
         </route>
+        
         <route id="_proxy">
             <from id="_from2" uri="cxfrs:bean:proxyEndpoint"/>
             <setProperty id="_CamelHttpPath" propertyName="HTTP_PATH">

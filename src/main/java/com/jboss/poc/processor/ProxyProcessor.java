@@ -25,6 +25,7 @@ public class ProxyProcessor implements Processor {
 		String queryString = (String) exchange.getIn().getHeader(Exchange.HTTP_QUERY);
 		String server = (String) exchange.getProperty("qradar.server");
 		
+		
 		//System.out.println("ProxyProcessor -> httpPath: " + httpPath);
 		
 		List<Object> providers = new ArrayList<Object>();
