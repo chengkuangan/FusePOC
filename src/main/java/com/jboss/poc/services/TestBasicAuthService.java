@@ -25,4 +25,5 @@ public class TestBasicAuthService {
 	public String doBasicAuth(@Body String data){
 		return "{\"status\":\"OK\"}";
 	}
+	
 }

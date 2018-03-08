@@ -13,6 +13,7 @@ import javax.ws.rs.core.MediaType;
 import org.apache.camel.Body;
 
 import com.jboss.poc.model.Incidents;
+import com.jboss.poc.model.resilient.auth.Auth;
 
 @Path("/")
 public class QIncidentsService {
@@ -100,5 +101,14 @@ public class QIncidentsService {
 		return "{\"status\":\"OK\"}";
 	}
 	
+	/*
+	@POST
+	@Path("/rest/session")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces (MediaType.APPLICATION_JSON)
+	public Auth postResilientAuth(@Body String data){
+		return null;
+	}
+	*/
 
 }
