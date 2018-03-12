@@ -22,12 +22,12 @@
     <bean class="com.jboss.poc.processor.ProxyProcessor" id="proxyProcessor"/>
     <bean class="com.jboss.poc.processor.TestBasicAuthProcessor" id="testBasicAuthProcessor"/>
     <bean class="com.jboss.poc.processor.TestResilientAuthProcessor" id="testResilientAuthProcessor"/>
+    <bean class="com.jboss.poc.processor.ResilientAuthProcessor" id="resilientAuthProcessor"/>
     <bean class="org.apache.activemq.camel.component.ActiveMQComponent" id="activemq">
         <property name="brokerURL" value="tcp://localhost:61616"/>
         <property name="userName" value="admin"/>
         <property name="password" value="admin"/>
     </bean>
-    
     <!-- /// Resilient Auth Client Endpoint -->
     <!--  Resilient Actual Address:https://172.16.6.115 -->
     <!--  Simulator address: http://localhost:9391/rest/session -->
@@ -128,7 +128,7 @@
             </setProperty>
             <to id="_to5" uri="direct:ResilientAuth"/>
             <setProperty id="_ResilientServer" propertyName="resilient.server">
-            	    <simple>https://172.16.6.115</simple>
+                <simple>https://172.16.6.115</simple>
                 <!-- <simple>http://localhost:9391</simple>  -->
             </setProperty>
             <setHeader headerName="CamelHttpPath" id="_CamelHttpPath2">
@@ -145,7 +145,10 @@
             <setHeader headerName="CamelHttpMethod" id="_CamelHttpMethod">
                 <simple>POST</simple>
             </setHeader>
-            <to id="_to4" uri="cxfrs:bean:resilientAuthServiceEndpoint"/>
+            <setProperty id="_ResilientAuthServer" propertyName="resilient.server">
+                <simple>https://172.16.6.115/rest/session</simple>
+            </setProperty>
+            <process id="_PostAuth" ref="resilientAuthProcessor"/>
             <unmarshal id="_unmarshal2">
                 <json library="Jackson" unmarshalTypeName="com.jboss.poc.model.resilient.auth.Auth"/>
             </unmarshal>
