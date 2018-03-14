@@ -13,7 +13,7 @@ import javax.ws.rs.core.MediaType;
 import org.apache.camel.Body;
 
 import com.jboss.poc.model.Incidents;
-import com.jboss.poc.model.resilient.auth.Auth;
+import com.jboss.poc.model.resilient.auth.Credential;
 
 @Path("/")
 public class QIncidentsService {

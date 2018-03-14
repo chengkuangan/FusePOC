@@ -6,9 +6,8 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({ "administrator", "observer", "master_administrator", "create_incs", "create_shared_layout" })
-public class Perms {
+public class Permissions {
 
-	
 	@JsonProperty("administrator")
 	private boolean administrator;
 	@JsonProperty("observer")
