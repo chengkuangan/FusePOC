@@ -129,8 +129,8 @@
             <to id="_to5" uri="direct:ResilientAuth"/>
             <log id="_log5" message="ResilientAuth -> Here 3"/>
             <setProperty id="_ResilientServer" propertyName="resilient.server">
-                <!-- simple>https://172.16.6.115</simple-->
-                <simple>http://localhost:9391</simple>
+                <simple>https://172.16.6.115</simple>
+                <!-- simple>http://localhost:9391</simple -->
             </setProperty>
             <setHeader headerName="CamelHttpPath" id="_CamelHttpPath2">
                 <simple>exchangeProperty.HTTP_PATH</simple>
@@ -148,8 +148,8 @@
                 <simple>POST</simple>
             </setHeader>
             <setProperty id="_ResilientAuthServer" propertyName="resilient.server">
-                <simple>http://localhost:9391/rest/session</simple>
-                <!-- simple>https://172.16.6.115/rest/session</simple -->
+                <!--  simple>http://localhost:9391/rest/session</simple -->
+                <simple>https://172.16.6.115/rest/session</simple>
             </setProperty>
             <process id="_PostAuth" ref="resilientAuthProcessor"/>
             <log id="_log2" message="ResilientAuth -> Here 1"/>
