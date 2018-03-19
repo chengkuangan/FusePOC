@@ -43,7 +43,9 @@ public class ResilientAuthProcessor implements Processor {
 		params.setTrustManagers(new TrustManager[] { new DumbX509TrustManager() });
 		params.setDisableCNCheck(true);
 				
-		System.out.println("ProxyProcessor -> URL called -> " + server);
+		System.out.println("ResilientAuthProcessor -> URL called -> " + server);
+		
+		WebClient.getConfig(client).getRequestContext().put(org.apache.cxf.message.Message.MAINTAIN_SESSION, Boolean.TRUE);
 		
 		//WebClient client = WebClient.create("http://" + server + "/" + "/incidents", providers);
 		client = client.accept("application/json").type("application/json");
