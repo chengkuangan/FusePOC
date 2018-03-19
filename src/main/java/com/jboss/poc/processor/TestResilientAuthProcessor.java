@@ -32,7 +32,7 @@ public class TestResilientAuthProcessor implements Processor {
 		
 		List<Object> providers = new ArrayList<Object>();
 		providers.add(new JacksonJsonProvider());
-		String url = server + "/" + httpPath;
+		String url = "https://172.16.6.115/rest/orgs/210/incidents"; //server + "/" + httpPath;
 		
 		WebClient client = WebClient.create(url, providers);
 		MultivaluedMap<String, String> headers = client.getHeaders();
@@ -65,7 +65,8 @@ public class TestResilientAuthProcessor implements Processor {
 		
 		Response r = client.get();
 		String resp = r.readEntity(String.class);
-		System.out.println("response -> " + resp);
+		System.out.println("TestResilientAuthProcessor -> response code = " + r.getStatus());
+		System.out.println("TestResilientAuthProcessor -> response -> " + resp);
 		exchange.getOut().setBody(resp);
 				
 	}

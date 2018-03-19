@@ -128,6 +128,7 @@
             </setProperty>
             <to id="_to5" uri="direct:ResilientAuth"/>
             <log id="_log5" message="ResilientAuth -> Here 3"/>
+            <process id="_GET" ref="testResilientAuthProcessor"/>
             <setProperty id="_ResilientServer" propertyName="resilient.server">
                 <simple>https://172.16.6.115</simple>
                 <!-- simple>http://localhost:9391</simple -->
@@ -135,13 +136,12 @@
             <setHeader headerName="CamelHttpPath" id="_CamelHttpPath2">
                 <simple>${exchangeProperty.HTTP_PATH}</simple>
             </setHeader>
-            <process id="_GET" ref="testResilientAuthProcessor"/>
             <log id="_log6" message="ResilientAuth -> Here 4"/>
         </route>
         <route id="_ResilientAuth">
             <from id="_from5" uri="direct:ResilientAuth"/>
             <setBody id="_AuthDetail">
-                <constant>{"email": "integration@stee.com", "password": "Pa55w0rd", "interactive": true}</constant>
+                <constant>{"email": "integration@stee.com", "password": "Pa55w0rd", "interactive": false}</constant>
             </setBody>
             <removeHeaders id="_CamelHttp" pattern="CamelHttp*"/>
             <setHeader headerName="CamelHttpMethod" id="_CamelHttpMethod">
