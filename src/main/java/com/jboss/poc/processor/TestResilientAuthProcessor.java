@@ -56,6 +56,8 @@ public class TestResilientAuthProcessor implements Processor {
 		}
 		params.setTrustManagers(new TrustManager[] { new DumbX509TrustManager() });
 		params.setDisableCNCheck(true);
+		
+		WebClient.getConfig(client).getRequestContext().put(org.apache.cxf.message.Message.MAINTAIN_SESSION, Boolean.TRUE);
 				
 		System.out.println("TestResilientAuthProcessor -> URL called -> " + url);
 		
