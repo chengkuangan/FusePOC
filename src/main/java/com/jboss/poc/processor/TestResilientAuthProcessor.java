@@ -36,8 +36,8 @@ public class TestResilientAuthProcessor implements Processor {
 		
 		WebClient client = WebClient.create(url, providers);
 		MultivaluedMap<String, String> headers = client.getHeaders();
-		//headers.add("X-sess-id", credential.getCsrfToken());
-		headers.add("X-sess-id", "abc");
+		headers.add("X-sess-id", credential.getCsrfToken());
+		//headers.add("X-sess-id", "ca5864537c622062953da8497ee33c57");
 		
 		System.out.println("CSRF Token -> " + credential.getCsrfToken());
 		client.headers(headers);
