@@ -32,7 +32,8 @@ public class TestResilientAuthProcessor implements Processor {
 		
 		List<Object> providers = new ArrayList<Object>();
 		providers.add(new JacksonJsonProvider());
-		String url = "https://172.16.6.115/rest/orgs/210/incidents"; //server + "/" + httpPath;
+		//String url = "https://172.16.6.115/rest/orgs/210/incidents"; //server + "/" + httpPath;
+		String url = "http://localhost:9391/rest/orgs/210/incidents";;
 		
 		WebClient client = WebClient.create(url, providers);
 		MultivaluedMap<String, String> headers = client.getHeaders();

@@ -23,43 +23,77 @@ public class ResilientAuthProcessor implements Processor {
 	@Override
 	public void process(Exchange exchange) throws Exception {
 		
-		String httpPath = (String) exchange.getIn().getHeader(Exchange.HTTP_PATH);
-		String httpMethod = (String) exchange.getIn().getHeader(Exchange.HTTP_METHOD);
-		String server = (String) exchange.getProperty("resilient.server");
+		//String server = (String) exchange.getProperty("resilient.server");
+		String authServer = "http://localhost:9391/rest/session";		// set the resilient authentication endpoint
+		String getServer = "http://localhost:9391/rest/orgs/210/incidents";	
 		
-		//System.out.println("ProxyProcessor -> httpPath: " + httpPath);
+		System.out.println();
+		//System.out.println("ResilientAuthProcessor -> URL called -> " + server);
+		System.out.println("ResilientAuthProcessor -> URL called -> " + authServer);
 		
+		// create the JSON provider
 		List<Object> providers = new ArrayList<Object>();
 		providers.add(new JacksonJsonProvider());
 		
-		// --- comment the following line if need to use Basic Authentication ----- //
-		WebClient client = WebClient.create(server, providers);
+		WebClient client = WebClient.create(authServer, providers);
+		ProcessorHelper.setJSONContentType(client);
 		
-		ClientConfiguration config = WebClient.getConfig(client);
-		HTTPConduit conduit = config.getHttpConduit();
-		TLSClientParameters params = conduit.getTlsClientParameters();
-		if (params == null) {
-			params = new TLSClientParameters();
-	        conduit.setTlsClientParameters(params);
-		}
-		params.setTrustManagers(new TrustManager[] { new DumbX509TrustManager() });
-		params.setDisableCNCheck(true);
+		// --- disable SSL cert validation
+		ProcessorHelper.disableCNCheck(client);
 		
-		System.out.println("ResilientAuthProcessor -> URL called -> " + server);
+		// --- enable HTTP session
+		ProcessorHelper.enableHTTPSession(client);
 		
-		WebClient.getConfig(client).getRequestContext().put(org.apache.cxf.message.Message.MAINTAIN_SESSION, Boolean.TRUE);
+		// START ------- commented out by Gan CK. Recplaced with next section to convert JSON directly to Credential object
+		/* Response r = client.post(exchange.getIn().getBody());
+		 String resp = r.readEntity(String.class);
+		 System.out.println("ResilientAuthProcessor -> response code = " + r.getStatus());
+		 exchange.getOut().setBody(resp); 
+		 */
+		// END ------- commented out by Gan CK. Recplaced with next section to convert JSON directly to Credential object
 		
-		//WebClient client = WebClient.create("http://" + server + "/" + "/incidents", providers);
-		client = client.accept("application/json").type("application/json");
+		// START ------ Convert JSON directly to Credential Object
 		Response r = client.post(exchange.getIn().getBody());
-		String resp = r.readEntity(String.class);
-		
 		System.out.println("ResilientAuthProcessor -> response code = " + r.getStatus());
-		
-		/*
 		Credential cre = r.readEntity(Credential.class);
 		String csrfToken = cre.getCsrfToken();
+		System.out.println("ResilientAuthProcessor -> csrfToken -> " + csrfToken);
+		// END ------ Convert JSON directly to Credential Object
 		
+		// START ------- Option 1 - Copy cookies from webclient1 to webclient2. Thus allowing creation of 2 different WebClients
+		
+		WebClient get_client = WebClient.create(getServer, providers);
+		ProcessorHelper.setJSONContentType(get_client);
+		ProcessorHelper.disableCNCheck(get_client);
+		ProcessorHelper.enableHTTPSession(get_client);
+		ProcessorHelper.copyCookies(client, get_client);
+		// setting the required session id for resilient
+		ProcessorHelper.setResilientSessionHeader(get_client, csrfToken);
+		Response get_r = get_client.get();
+		System.out.println("ResilientAuthProcessor -> URL called -> " + getServer);
+		System.out.println("ResilientAuthProcessor -> response code = " + get_r.getStatus());
+		String resp = get_r.readEntity(String.class);
+		exchange.getOut().setBody(resp);
+		
+		// END ------- Option 1 - Copy cookies from webclient1 to webclient2
+		
+		// START ------- Option 2 - Reusing the webclient but set a different context path
+		/* 
+		ProcessorHelper.setResilientSessionHeader(client, csrfToken);
+		client.replacePath("/rest/orgs/210/incidents");
+		System.out.println("ResilientAuthProcessor -> calling incidents...");
+		r = client.get();
+		System.out.println("ResilientAuthProcessor -> response code = " + r.getStatus());
+		String resp = r.readEntity(String.class);
+		exchange.getOut().setBody(resp);
+		*/
+		// END ------- Option 2 - Reusing the webclient but set a different context path
+		
+		// --- changed to GET using the same WebClient.
+		/*
+		Response r = client.post(exchange.getIn().getBody());
+		Credential cre = r.readEntity(Credential.class);
+		String csrfToken = cre.getCsrfToken();
 		System.out.println("ResilientAuthProcessor -> csrfToken -> " + csrfToken);
 		
 		client.replacePath("/rest/orgs/210/incidents");
@@ -81,10 +115,8 @@ public class ResilientAuthProcessor implements Processor {
 		System.out.println("ResilientAuthProcessor -> here 5");
 		System.out.println("response -> " + resp);
 		System.out.println("ResilientAuthProcessor -> here 6");
-		*/
 		exchange.getOut().setBody(resp);
-		
-				
+		*/		
 	}
 	
 

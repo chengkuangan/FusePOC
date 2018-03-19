@@ -31,7 +31,7 @@
     <!-- /// Resilient Auth Client Endpoint -->
     <!--  Resilient Actual Address:https://172.16.6.115 -->
     <!--  Simulator address: http://localhost:9391/rest/session -->
-    <cxf:rsClient address="https://172.16.6.115/rest/session"
+    <cxf:rsClient address="http://localhost:9391/rest/session"
         id="resilientAuthServiceEndpoint" loggingFeatureEnabled="true" serviceClass="com.jboss.poc.services.ResilientAuthService">
         <cxf:providers>
             <bean class="com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider"/>
@@ -59,6 +59,8 @@
         </cxf:providers>
     </cxf:rsServer>
     <!-- /// Proxy Server Endpoint -->
+    <!--  proxy Actual Address:http://172.30.1.87:9291 -->
+    <!--  Simulator address: http://localhost:9291/ -->
     <cxf:rsServer address="http://172.30.1.87:9291/" id="proxyEndpoint"
         loggingFeatureEnabled="true" serviceClass="com.jboss.poc.services.QIncidentsService">
         <cxf:providers>
@@ -68,7 +70,8 @@
     <camelContext id="_camelContext1" xmlns="http://camel.apache.org/schema/spring">
         <!--  endpoint id="Java2Java" uri="dozer:Java2Java?sourceModel=com.jboss.poc.model.Type&amp;targetModel=com.jboss.poc.model.Action&amp;mappingFile=transformation.xml"/ -->
         <!-- /// Receive Incidents from QRadar Route  -->
-        <route id="_receiveIncidentsFromQRadar">
+        <!--  
+        <route id="_receiveIncidentsFromQRadar_NOTinUSED">
             <from id="_from_cxfrs_apiEndpoint" uri="cxfrs:bean:qIncidentsEndpoint"/>
             <log id="_log11" message="qIncidentsEndpoint -> body : ${body}"/>
             <convertBodyTo id="_convertBodyTo1" type="java.lang.String"/>
@@ -78,12 +81,11 @@
                 <simple>{"status":"ok"}</simple>
             </setBody>
         </route>
-        <!-- /// Post Incidents to Resilient Route  -->
-        <route id="_postIncidentsToResilient">
+        <route id="_postIncidentsToResilient_NOTinUSED">
             <from id="_from1" uri="activemq:queue:ste.queue.qIncidents"/>
             <setProperty id="_setResilientServer" propertyName="resilient.server">
                 <simple>https://172.16.6.115</simple>
-                <!--  -simple>http://localhost:9390</simple-->
+                //<simple>http://localhost:9390</simple>
             </setProperty>
             <setProperty id="_setOriginalMessage" propertyName="original.message">
                 <simple>${body}</simple>
@@ -93,6 +95,7 @@
             </unmarshal>
             <process id="_PostToResilient" ref="incidentsProcessor"/>
         </route>
+        -->
         <!-- /// Proxy Route  -->
         <route id="_proxy">
             <from id="_from2" uri="cxfrs:bean:proxyEndpoint"/>
@@ -116,49 +119,56 @@
             </setBody>
         </route>
         <!-- /// Test QRadar Basic Authentication Route  -->
+        <!-- Not required anymore
         <route autoStartup="false" id="_TestBasicAuth">
             <from id="_from3" uri="cxfrs:bean:testBasicAuthEndpoint"/>
             <process id="_CallPostman" ref="testBasicAuthProcessor"/>
         </route>
+        -->
         <!-- /// Test Resilient Authentication Route  -->
+        <!-- Not required anymore
         <route id="_TestResilientAuthentication">
             <from id="_from4" uri="cxfrs:bean:testResilientAuthEndpoint"/>
             <setProperty id="_HTTPPATH" propertyName="HTTP_PATH">
                 <simple>${header.CamelHttpPath}</simple>
             </setProperty>
+            <process id="_GET" ref="testResilientAuthProcessor"/>
             <to id="_to5" uri="direct:ResilientAuth"/>
             <log id="_log5" message="ResilientAuth -> Here 3"/>
-            <process id="_GET" ref="testResilientAuthProcessor"/>
             <setProperty id="_ResilientServer" propertyName="resilient.server">
-                <simple>https://172.16.6.115</simple>
-                <!-- simple>http://localhost:9391</simple -->
+                // <simple>https://172.16.6.115</simple>
+                <simple>http://localhost:9391</simple>
             </setProperty>
             <setHeader headerName="CamelHttpPath" id="_CamelHttpPath2">
                 <simple>${exchangeProperty.HTTP_PATH}</simple>
             </setHeader>
             <log id="_log6" message="ResilientAuth -> Here 4"/>
         </route>
+         -->
         <route id="_ResilientAuth">
-            <from id="_from5" uri="direct:ResilientAuth"/>
-            <setBody id="_AuthDetail">
-                <constant>{"email": "integration@stee.com", "password": "Pa55w0rd", "interactive": false}</constant>
-            </setBody>
+            <!--  <from id="_from5" uri="direct:ResilientAuth"/> -->
+            <!-- Commented out -->
+            <!--  <unmarshal id="_unmarshal2">
+                <json library="Jackson" unmarshalTypeName="com.jboss.poc.model.resilient.auth.Credential"/>
+            </unmarshal>
+            -->
+            <!-- 
             <removeHeaders id="_CamelHttp" pattern="CamelHttp*"/>
             <setHeader headerName="CamelHttpMethod" id="_CamelHttpMethod">
                 <simple>POST</simple>
             </setHeader>
+             
             <setProperty id="_ResilientAuthServer" propertyName="resilient.server">
-                <!--  simple>http://localhost:9391/rest/session</simple -->
-                <simple>https://172.16.6.115/rest/session</simple>
+                <simple>http://localhost:9391/rest/session</simple>
+                //<simple>https://172.16.6.115/rest/session</simple>
             </setProperty>
-            <process id="_PostAuth" ref="resilientAuthProcessor"/>
+            -->
+            <from id="_from4" uri="cxfrs:bean:testResilientAuthEndpoint"/>
+            <setBody id="_AuthDetail">
+                <constant>{"email": "integration@stee.com", "password": "Pa55w0rd", "interactive": true}</constant>
+            </setBody>
+            <process id="_Auth_GET" ref="resilientAuthProcessor"/>
             <log id="_log7" message="After Auth -> Body -> ${body}"/>
-            <log id="_log2" message="ResilientAuth -> Here 1"/>
-            <unmarshal id="_unmarshal2">
-                <json library="Jackson" unmarshalTypeName="com.jboss.poc.model.resilient.auth.Credential"/>
-            </unmarshal>
-            <log id="_log3" message="ResilientAuth -> Here 2"/>
-            <log id="_log4" message="CRSFToken -> ${body}"/>
         </route>
     </camelContext>
 </beans>
