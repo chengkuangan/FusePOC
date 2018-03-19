@@ -1,6 +1,8 @@
 package com.jboss.poc.model.resilient.auth;
 
 import java.util.List;
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
@@ -30,6 +32,8 @@ public class Credential {
 	private boolean isSaml;
 	@JsonProperty("is_ldap")
 	private boolean isLdap;
+	@JsonIgnoreProperties
+	private String jsessionid;
 
 	@JsonProperty("orgs")
 	public List<Organization> getOrgs() {
@@ -129,6 +133,14 @@ public class Credential {
 	@JsonProperty("is_ldap")
 	public void setIsLdap(boolean isLdap) {
 		this.isLdap = isLdap;
+	}
+
+	public String getJsessionid() {
+		return jsessionid;
+	}
+
+	public void setJsessionid(String jsessionid) {
+		this.jsessionid = jsessionid;
 	}
 
 }
