@@ -1,7 +1,9 @@
 package com.jboss.poc.processor;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import javax.net.ssl.TrustManager;
 import javax.ws.rs.core.MultivaluedMap;
@@ -34,9 +36,16 @@ public class TestResilientAuthProcessor implements Processor {
 		
 		WebClient client = WebClient.create(url, providers);
 		MultivaluedMap<String, String> headers = client.getHeaders();
-		headers.add("X-sess-id", credential.getCsrfToken());
+		//headers.add("X-sess-id", credential.getCsrfToken());
+		headers.add("X-sess-id", "abc");
+		
+		System.out.println("CSRF Token -> " + credential.getCsrfToken());
 		client.headers(headers);
 		
+		for (Iterator<String> iter = headers.keySet().iterator(); iter.hasNext();) {
+			String header = iter.next();
+			System.out.println("headers -> " + header + " = " + headers.get(header));
+		}
 		
 		ClientConfiguration config = WebClient.getConfig(client);
 		HTTPConduit conduit = config.getHttpConduit();
@@ -48,12 +57,13 @@ public class TestResilientAuthProcessor implements Processor {
 		params.setTrustManagers(new TrustManager[] { new DumbX509TrustManager() });
 		params.setDisableCNCheck(true);
 				
-		System.out.println("ProxyProcessor -> URL called -> " + url);
+		System.out.println("TestResilientAuthProcessor -> URL called -> " + url);
 		
 		client = client.accept("application/json").type("application/json");
-		Response r = client.get();
 		
+		Response r = client.get();
 		String resp = r.readEntity(String.class);
+		System.out.println("response -> " + resp);
 		exchange.getOut().setBody(resp);
 				
 	}

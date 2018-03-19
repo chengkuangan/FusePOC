@@ -133,7 +133,7 @@
                 <!-- simple>http://localhost:9391</simple -->
             </setProperty>
             <setHeader headerName="CamelHttpPath" id="_CamelHttpPath2">
-                <simple>exchangeProperty.HTTP_PATH</simple>
+                <simple>${exchangeProperty.HTTP_PATH}</simple>
             </setHeader>
             <process id="_GET" ref="testResilientAuthProcessor"/>
             <log id="_log6" message="ResilientAuth -> Here 4"/>
@@ -141,7 +141,7 @@
         <route id="_ResilientAuth">
             <from id="_from5" uri="direct:ResilientAuth"/>
             <setBody id="_AuthDetail">
-                <constant>{"email": "admin@mail.com", "password": "P@55w0rd", "interactive": true}</constant>
+                <constant>{"email": "admin@email.com", "password": "P@ssw0rd", "interactive": true}</constant>
             </setBody>
             <removeHeaders id="_CamelHttp" pattern="CamelHttp*"/>
             <setHeader headerName="CamelHttpMethod" id="_CamelHttpMethod">
@@ -152,6 +152,7 @@
                 <simple>https://172.16.6.115/rest/session</simple>
             </setProperty>
             <process id="_PostAuth" ref="resilientAuthProcessor"/>
+            <log id="_log7" message="After Auth -> Body -> ${body}"/>
             <log id="_log2" message="ResilientAuth -> Here 1"/>
             <unmarshal id="_unmarshal2">
                 <json library="Jackson" unmarshalTypeName="com.jboss.poc.model.resilient.auth.Credential"/>
