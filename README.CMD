@@ -91,3 +91,9 @@ Remember to change the following content to reflect the actual authentication cr
 
 Note: To test this demo without the actual QRadar and Resilient Servers, please deploy the FusePOCSimulator first. Then use Postman to test.
 
+1. Sample data for creating incidents POST:
+{
+	"name": "Incidents 201",
+	"discovered_date": 0
+	
+}
