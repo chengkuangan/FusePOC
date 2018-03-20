@@ -164,6 +164,10 @@
             </setProperty>
             -->
             <from id="_from4" uri="cxfrs:bean:testResilientAuthEndpoint"/>
+            <convertBodyTo id="_convertBodyTo1" type="java.lang.String"/>
+            <setProperty id="_setProperty1" propertyName="POST_BODY">
+                <simple>${body}</simple>
+            </setProperty>
             <setBody id="_AuthDetail">
                 <constant>{"email": "integration@stee.com", "password": "Pa55w0rd", "interactive": true}</constant>
             </setBody>

@@ -85,12 +85,18 @@ public class ResilientAuthProcessor implements Processor {
 		ProcessorHelper.setResilientSessionHeader(get_client, csrfToken);
 		Response get_r = null;
 		if (httpMethod.equalsIgnoreCase("POST")) {
-			get_r = get_client.post(exchange.getIn().getBody());
+			String body = (String) exchange.getProperty("POST_BODY");
+			System.out.println("ResilientAuthProcessor -> HTTP Method -> POST : " + httpMethod);
+			System.out.println("ResilientAuthProcessor -> Body -> " +body);
+			
+			get_r = get_client.post(body);
 		}
 		else if (httpMethod.equalsIgnoreCase("GET")) {
+			System.out.println("ResilientAuthProcessor -> HTTP Method -> POST : " + httpMethod);
 			get_r = get_client.get();
 		}
 		else  if (httpMethod.equalsIgnoreCase("DELETE")){ //delete
+			System.out.println("ResilientAuthProcessor -> HTTP Method -> POST : " + httpMethod);
 			get_r = get_client.delete();
 		}
 		//Response get_r = get_client.get();
