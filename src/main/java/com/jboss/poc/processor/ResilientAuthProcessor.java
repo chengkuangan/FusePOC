@@ -24,8 +24,8 @@ public class ResilientAuthProcessor implements Processor {
 	public void process(Exchange exchange) throws Exception {
 		
 		//String server = (String) exchange.getProperty("resilient.server");
-		String authServer = "http://localhost:9391/rest/session";		// set the resilient authentication endpoint
-		String getServer = "http://localhost:9391/rest/orgs/210/incidents";	
+		String authServer = "https://172.16.6.115/rest/session";		// set the resilient authentication endpoint
+		String getServer = "https://172.16.6.115/rest/orgs/210/incidents";	
 		
 		System.out.println();
 		//System.out.println("ResilientAuthProcessor -> URL called -> " + server);
