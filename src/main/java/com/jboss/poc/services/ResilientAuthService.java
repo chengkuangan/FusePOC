@@ -1,6 +1,7 @@
 package com.jboss.poc.services;
 
 import javax.ws.rs.CookieParam;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -26,6 +27,20 @@ public class ResilientAuthService {
 	@Path("/rest/orgs/210/incidents")
     @Produces({MediaType.APPLICATION_JSON })
     public String testIncidents(String data) {
+		return data;
+	}
+	
+	@POST
+	@Path("/rest/orgs/210/incidents")
+    @Produces({MediaType.APPLICATION_JSON })
+    public String postIncidents(@Body String data) {
+		return data;
+	}
+	
+	@DELETE
+	@Path("/rest/orgs/210/incidents/{incidents_id}")
+    @Produces({MediaType.APPLICATION_JSON })
+    public String deleteIncidents(@Body String data) {
 		return data;
 	}
 	

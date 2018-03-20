@@ -24,12 +24,22 @@ public class ResilientAuthProcessor implements Processor {
 	public void process(Exchange exchange) throws Exception {
 		
 		//String server = (String) exchange.getProperty("resilient.server");
+		String httpMethod = (String) exchange.getIn().getHeader(Exchange.HTTP_METHOD);
+		String httpPath = (String) exchange.getIn().getHeader(Exchange.HTTP_PATH);
+		String queryString = (String) exchange.getIn().getHeader(Exchange.HTTP_QUERY);
+		//System.out.println("path = " + httpPath);
+		
+		queryString = (queryString !=null && queryString.trim().length() > 0) ? "?" + queryString : "";
+		
 		String authServer = "https://172.16.6.115/rest/session";		// set the resilient authentication endpoint
-		String getServer = "https://172.16.6.115/rest/orgs/210/incidents";	
+		String getServer = "https://172.16.6.115/rest/orgs/210/incidents" + queryString;
+		String deleteServer = "https://172.16.6.115/";
 		
 		System.out.println();
 		//System.out.println("ResilientAuthProcessor -> URL called -> " + server);
 		System.out.println("ResilientAuthProcessor -> URL called -> " + authServer);
+		
+		
 		
 		// create the JSON provider
 		List<Object> providers = new ArrayList<Object>();
@@ -62,6 +72,10 @@ public class ResilientAuthProcessor implements Processor {
 		
 		// START ------- Option 1 - Copy cookies from webclient1 to webclient2. Thus allowing creation of 2 different WebClients
 		
+		if (httpMethod.equalsIgnoreCase("DELETE")) {
+			getServer = deleteServer + httpPath + queryString;
+		}
+		
 		WebClient get_client = WebClient.create(getServer, providers);
 		ProcessorHelper.setJSONContentType(get_client);
 		ProcessorHelper.disableCNCheck(get_client);
@@ -69,7 +83,17 @@ public class ResilientAuthProcessor implements Processor {
 		ProcessorHelper.copyCookies(client, get_client);
 		// setting the required session id for resilient
 		ProcessorHelper.setResilientSessionHeader(get_client, csrfToken);
-		Response get_r = get_client.get();
+		Response get_r = null;
+		if (httpMethod.equalsIgnoreCase("POST")) {
+			get_r = get_client.post(exchange.getIn().getBody());
+		}
+		else if (httpMethod.equalsIgnoreCase("GET")) {
+			get_r = get_client.get();
+		}
+		else  if (httpMethod.equalsIgnoreCase("DELETE")){ //delete
+			get_r = get_client.delete();
+		}
+		//Response get_r = get_client.get();
 		System.out.println("ResilientAuthProcessor -> URL called -> " + getServer);
 		System.out.println("ResilientAuthProcessor -> response code = " + get_r.getStatus());
 		String resp = get_r.readEntity(String.class);
