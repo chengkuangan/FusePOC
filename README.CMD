@@ -83,6 +83,7 @@ Sample Body (raw with application/json):
 2. Test Scenario 2 - 9.
 
 The Jboss Fuse exposed endpoint is http://<Fuse IP>:9291/
+<Fuse IP> refers to the IP address configured at the Pre-Req, Step 3 above.
 
 Example: http://localhost:9291/api/siem/offenses
 
