@@ -169,7 +169,7 @@
                 <simple>${body}</simple>
             </setProperty>
             <setBody id="_AuthDetail">
-                <constant>{"email": "integration@stee.com", "password": "Pa55w0rd", "interactive": true}</constant>
+                <constant>{"email": "integration@example.com", "password": "Pa55w0rd", "interactive": true}</constant>
             </setBody>
             <process id="_Auth_GET" ref="resilientAuthProcessor"/>
             <log id="_log7" message="After Auth -> Body -> ${body}"/>
